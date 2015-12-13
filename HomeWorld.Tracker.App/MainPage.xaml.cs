@@ -3,6 +3,7 @@ using HomeWorld.Tracker.App.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using uPLibrary.Nfc;
 using uPLibrary.Hardware.Nfc;
 using Windows.UI.Core;
@@ -29,10 +30,7 @@ namespace HomeWorld.Tracker.App
 
         public MainPage()
         {
-            this.InitializeComponent();
-
-            //Connect with NFC reader
-            CreateNfcREader();
+            InitializeComponent();
 
             _pobCount = 0;
             txtCount.Text = _pobCount.ToString();
@@ -40,37 +38,55 @@ namespace HomeWorld.Tracker.App
             DataContext = this;
             _personService = new PersonService();
             _dispatcher = Window.Current.Dispatcher;
+
+            //start background task to connect to card Reader.
+            var task = new Task(async () => await CreateNfcReader());
+            task.Start();
         }
 
-        private void CreateNfcREader()
+        private async Task CreateNfcReader()
         {
-            SetNfcStatus("Connecting to RFID Reader through UART Bridge ...");
-
-            _nfcReader?.Close();
-
-            Pn532CommunicationHsu.CreateSerialPort(UartBridgeName).ContinueWith(t =>
+            while (true)
             {
-                if (t.IsFaulted || t.Result == null)
+                if (_nfcReader == null || _nfcReader != null && !_nfcReader.IsRunning)
                 {
-                    SetNfcStatus("Reader port configuration failed");
+                    SetNfcStatus("Connecting to RFID Reader through UART Bridge ...");
 
-                    return;
-                }
+                    if (_nfcReader != null)
+                    {
+                        await Task.Delay(2000);
+                        _nfcReader.Close();
+                    }
 
-                _nfcReader = new NfcPN532Reader(t.Result);
-                _nfcReader.TagDetected += nfc_TagDetected;
-                _nfcReader.TagLost += nfc_TagLost;
+                    try
+                    {
+                        var portCreated = await Pn532CommunicationHsu.CreateSerialPort(UartBridgeName);
 
-                try
-                {
-                    var openResult = _nfcReader.Open(NfcTagType.MifareUltralight).Wait(5000);
-                    SetNfcStatus(openResult ? "Reader ready" : "Reader open failed");
+                        _nfcReader = new NfcPn532Reader(portCreated);
+                        _nfcReader.TagDetected += nfc_TagDetected;
+                        _nfcReader.TagLost += nfc_TagLost;
+
+                        await ReaderOpen();
+                    }
+                    catch (Exception)
+                    {
+                        SetNfcStatus("Reader port configuration failed");
+                    }
                 }
-                catch (Exception)
-                {
-                    SetNfcStatus("Reader open failed");
-                }
-            });
+            }
+        }
+
+        private async Task ReaderOpen()
+        {
+            try
+            {
+                await _nfcReader.Open(NfcTagType.MifareUltralight);
+                SetNfcStatus("Reader ready");
+            }
+            catch (Exception)
+            {
+                SetNfcStatus("Reader open failed");
+            }
         }
 
         private async void SetNfcStatus(string value)
