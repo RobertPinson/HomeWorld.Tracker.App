@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Tracker.Models
+namespace HomeWorld.Tracker.Web.Models
 {
     public class Card
     {

@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.Data.Entity.Migrations;
 using Microsoft.Data.Entity.Metadata;
+using Microsoft.Data.Entity.Migrations;
 
-namespace Tracker.Migrations.TrackerDb
+namespace HomeWorld.Tracker.Web.Migrations.TrackerDb
 {
     public partial class initial : Migration
     {

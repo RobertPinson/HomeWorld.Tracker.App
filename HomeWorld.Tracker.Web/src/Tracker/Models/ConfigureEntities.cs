@@ -1,6 +1,6 @@
 using Microsoft.Data.Entity;
 
-namespace Tracker.Models
+namespace HomeWorld.Tracker.Web.Models
 {
     internal class ConfigureEntities
     {

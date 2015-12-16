@@ -1,11 +1,10 @@
-using System;
+using HomeWorld.Tracker.Web.Models;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Infrastructure;
 using Microsoft.Data.Entity.Metadata;
 using Microsoft.Data.Entity.Migrations;
-using Tracker.Models;
 
-namespace Tracker.Migrations.TrackerDb
+namespace HomeWorld.Tracker.Web.Migrations.TrackerDb
 {
     [DbContext(typeof(TrackerDbContext))]
     [Migration("20151208211829_initial")]

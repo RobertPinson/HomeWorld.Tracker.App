@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using HomeWorld.Tracker.Web.Models;
+using HomeWorld.Tracker.Web.Services;
+using HomeWorld.Tracker.Web.ViewModels.Account;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
-using Tracker.Models;
-using Tracker.Services;
-using Tracker.ViewModels.Account;
 
-namespace Tracker.Controllers
+namespace HomeWorld.Tracker.Web.Controllers
 {
     [Authorize]
     public class AccountController : Controller

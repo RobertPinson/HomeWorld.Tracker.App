@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using HomeWorld.Tracker.Web.Models;
+using HomeWorld.Tracker.Web.Services;
+using HomeWorld.Tracker.Web.ViewModels.Manage;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
-using Tracker.Models;
-using Tracker.Services;
-using Tracker.ViewModels.Manage;
 
-namespace Tracker.Controllers
+namespace HomeWorld.Tracker.Web.Controllers
 {
     [Authorize]
     public class ManageController : Controller

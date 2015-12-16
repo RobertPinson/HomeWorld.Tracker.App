@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Data.Entity;
+﻿using Microsoft.Data.Entity;
 
-namespace Tracker.Models
+namespace HomeWorld.Tracker.Web.Models
 {
     public class TrackerDbContext : DbContext
     {
