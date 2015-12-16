@@ -48,7 +48,6 @@ namespace uPLibrary.Hardware.Nfc
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="deviceName">Serial port name</param>
         private Pn532CommunicationHsu(SerialDevice reader)
         {
             if (reader == null) throw new ArgumentNullException("serial card reader is not set");
@@ -71,14 +70,13 @@ namespace uPLibrary.Hardware.Nfc
         {
             string deviceQuery = SerialDevice.GetDeviceSelector();
             var discovered = await DeviceInformation.FindAllAsync(deviceQuery);
-            var readerInfo = discovered.FirstOrDefault(x => x.Name.IndexOf(deviceName, StringComparison.OrdinalIgnoreCase) > 0);
-            //var readerInfo = discovered[0];
+            //var readerInfo = discovered.FirstOrDefault(x => x.Name.IndexOf(deviceName, StringComparison.OrdinalIgnoreCase) > 0);
+            var readerInfo = discovered.FirstOrDefault();
 
             SerialDevice reader = null;
 
             if (readerInfo != null)
             {
-
                 reader = await SerialDevice.FromIdAsync(readerInfo.Id);
 
                 if (reader != null)
@@ -100,7 +98,7 @@ namespace uPLibrary.Hardware.Nfc
         }
 
         /// <summary>
-        /// internal encapsulation of the response read from the Cottonwood
+        /// Result model
         /// after issuing a command
         /// </summary>
         internal class RfidReaderResult
@@ -119,10 +117,14 @@ namespace uPLibrary.Hardware.Nfc
             var retvalue = new RfidReaderResult();
             var dataReader = new DataReader(_rfidReader.InputStream);
 
+            var cancellationTokenSource = new CancellationTokenSource(2000);
+            var token = cancellationTokenSource.Token; 
+
             try
             {
                 //Awaiting Data from RFID Reader
-                var numBytesRecvd = await dataReader.LoadAsync(1024);
+                
+                var numBytesRecvd = await dataReader.LoadAsync(1024).AsTask(token);
                 retvalue.Result = new byte[numBytesRecvd];
                 if (numBytesRecvd > 0)
                 {
@@ -130,11 +132,13 @@ namespace uPLibrary.Hardware.Nfc
                     dataReader.ReadBytes(retvalue.Result);
                     retvalue.IsSuccessful = true;
 
-                    Debug.WriteLine("Read: {0}", BitConverter.ToString(retvalue.Result));
+                    Debug.WriteLine($"Read: {BitConverter.ToString(retvalue.Result)}");
                 }
             }
             catch (Exception)
             {
+                //dataReader.DetachStream();
+                //_rfidReader.Dispose();
                 retvalue.IsSuccessful = false;
                 throw;
             }
@@ -168,14 +172,11 @@ namespace uPLibrary.Hardware.Nfc
                 retvalue.Result = writeBytes;
                 //Writing of command has been successful
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
             finally
             {
                 dataWriter.DetachStream();
             }
+
             return retvalue;
         }
 
@@ -389,9 +390,9 @@ namespace uPLibrary.Hardware.Nfc
 
             // HSU wake up consist to send a SAM configuration command with a "long" preamble 
             // here we send preamble that will be followed by regular SAM configuration command
-            byte[] pre1 = {0x55, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+            //byte[] pre1 = {0x55, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
             byte[] preamble = { 0x55, 0x55, 0x00, 0x00, 0x00 };
-            await Write(pre1);
+            await Write(preamble);
         }
 
         public void Close()

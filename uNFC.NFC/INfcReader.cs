@@ -10,10 +10,12 @@ namespace uPLibrary.Nfc
     /// </summary>
     public interface INfcReader
     {
+        bool IsRunning { get; set; }
+
         /// <summary>
         /// Open NFC reader to detect tag
         /// </summary>
-        /// <param name="nfcType">NFC target type</param>
+        /// <param name="nfcTagType"></param>
         Task Open(NfcTagType nfcTagType);
 
         /// <summary>

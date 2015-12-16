@@ -52,7 +52,7 @@ namespace uNFC.TestHarness
                     return;
                 }
 
-                nfc = new NfcPN532Reader(t.Result);
+                nfc = new NfcPn532Reader(t.Result);
                 nfc.TagDetected += nfc_TagDetected;
                 nfc.TagLost += nfc_TagLost;
 
