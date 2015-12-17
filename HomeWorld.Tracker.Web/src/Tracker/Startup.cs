@@ -1,4 +1,5 @@
-﻿using HomeWorld.Tracker.Web.Models;
+﻿using HomeWorld.Tracker.Web.Domain;
+using HomeWorld.Tracker.Web.Models;
 using HomeWorld.Tracker.Web.Services;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
@@ -55,6 +56,7 @@ namespace HomeWorld.Tracker.Web
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
+            services.AddTransient<IMovementService, MovementService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
