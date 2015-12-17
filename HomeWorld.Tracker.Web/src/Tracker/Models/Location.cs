@@ -2,13 +2,12 @@
 
 namespace HomeWorld.Tracker.Web.Models
 {
-    public class Card
+    public class Location
     {
         public int Id { get; set; }
-        public string Uid { get; set; }
-        public bool IsDeleted { get; set; }
+        public string Name { get; set; }
 
-        public ICollection<PersonCard> PersonCards { get; set; }
         public ICollection<Movement> Movements { get; set; }
+        public ICollection<Device> Devices { get; set; }
     }
 }
