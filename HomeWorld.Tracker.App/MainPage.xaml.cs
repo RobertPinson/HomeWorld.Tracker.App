@@ -3,6 +3,7 @@ using HomeWorld.Tracker.App.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using uPLibrary.Nfc;
 using uPLibrary.Hardware.Nfc;
@@ -108,7 +109,7 @@ namespace HomeWorld.Tracker.App
             Debug.WriteLine("DETECTED {0}", id);
 
             //Call service to get associated person details
-            var person = await _personService.GetPerson(id);
+            var movementResponseDto = await _personService.PostMovement(id);
 
             //TODO store locally
 
@@ -116,9 +117,28 @@ namespace HomeWorld.Tracker.App
             await _dispatcher.RunAsync(
                 CoreDispatcherPriority.Normal, () =>
                 {
-                    PeopleOnBoard.Add(new PobItem { Id = person.Id.ToString(), Name = $"{person.FirstName} {person.LastName}" });
-                    _pobCount++;
-                    txtCount.Text = _pobCount.ToString();
+                    var pobItem = new PobItem
+                    {
+                        Id = movementResponseDto.Id.ToString(),
+                        Name = $"{movementResponseDto.Name}"
+                    };
+                    if (movementResponseDto.Ingress)
+                    {
+                        PeopleOnBoard.Add(pobItem);
+                        _pobCount++;
+                        txtCount.Text = _pobCount.ToString();
+                    }
+                    else
+                    {
+                        var item = PeopleOnBoard.FirstOrDefault(i => i.Id == pobItem.Id);
+
+                        if (item != null)
+                        {
+                            PeopleOnBoard.Remove(item);
+                            _pobCount--;
+                            txtCount.Text = _pobCount.ToString();
+                        }
+                    }
                 });
         }
 

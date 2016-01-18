@@ -20,13 +20,15 @@ namespace HomeWorld.Tracker.Web.Models
 
             if (!trackerContext.Device.Any())
             {
-                if (!trackerContext.Location.Any(l => l.Name == "Head Office"))
+                if (!trackerContext.Location.Any(l => l.Name == "OffSite"))
                 {
-                    var location = new Location {Name = "Head Office"};
-                    trackerContext.Location.Add(location);
+                    var offSite = new Location {Name = "OffSite"};
+                    trackerContext.Location.Add(offSite);
+                    var headOffice = new Location { Name = "Head Office" };
+                    trackerContext.Location.Add(headOffice);
                     trackerContext.SaveChanges();
 
-                    trackerContext.Device.AddRange(new Device { Name = "Main Entrance", IsActive = true, LocationId = location.Id });
+                    trackerContext.Device.AddRange(new Device { Name = "Main Entrance", IsActive = true, LocationId = headOffice.Id });
                     trackerContext.SaveChanges();
                 }
             }

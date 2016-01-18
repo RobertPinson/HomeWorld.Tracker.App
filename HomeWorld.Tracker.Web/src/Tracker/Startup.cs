@@ -66,13 +66,13 @@ namespace HomeWorld.Tracker.Web
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
+            app.UseRuntimeInfoPage();
 
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-               
 
                 using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                    .CreateScope())
@@ -85,7 +85,7 @@ namespace HomeWorld.Tracker.Web
             }
             else
             {
-                app.EnsureSampleData();
+                //app.EnsureSampleData();
                 app.UseExceptionHandler("/Home/Error");
 
                 // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859

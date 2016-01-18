@@ -109,8 +109,7 @@ namespace uPLibrary.Nfc
         /// <param name="conn">Connection instance to NFC tag</param>
         private void OnTagDetected(NfcTagType nfcTagType, NfcTagConnection conn)
         {
-            if (TagDetected != null)
-                TagDetected(this, new NfcTagEventArgs(nfcTagType, conn));
+            TagDetected?.Invoke(this, new NfcTagEventArgs(nfcTagType, conn));
         }
 
         /// <summary>
@@ -120,8 +119,7 @@ namespace uPLibrary.Nfc
         /// <param name="conn">Connection instance to NFC tag</param>
         private void OnTagLost(NfcTagType nfcTagType, NfcTagConnection conn)
         {
-            if (TagLost != null)
-                TagLost(this, new NfcTagEventArgs(nfcTagType, conn));
+            TagLost?.Invoke(this, new NfcTagEventArgs(nfcTagType, conn));
         }
 
         /// <summary>

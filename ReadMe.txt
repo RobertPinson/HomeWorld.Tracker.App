@@ -3,6 +3,8 @@ Test cards
 FD-A6-4A-95
 
 Migration Commands
+--Identity schema
+dnx ef database update 00000000000000_CreateIdentitySchema -c ApplicationDbContext
 
 dnx ef migrations add initial -c TrackerDbContext
 dnx ef database update initial -c TrackerDbContext

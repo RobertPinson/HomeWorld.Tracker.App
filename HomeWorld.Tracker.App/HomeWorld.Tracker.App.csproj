@@ -139,10 +139,17 @@
     <Folder Include="Domain\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\HomeWorld.Tracker.Dto\HomeWorld.Tracker.Dto.csproj">
+      <Project>{e5e97494-e0bd-4b51-9263-181de9c020df}</Project>
+      <Name>HomeWorld.Tracker.Dto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\uNFC.NFC\uNFC.NFC.csproj">
       <Project>{7a04226c-b29c-4599-80b9-633630cd8c76}</Project>
       <Name>uNFC.NFC</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

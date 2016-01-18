@@ -7,12 +7,7 @@
     mc:Ignorable="d" Height="800" Width="1280" Background="Black">
 
     <Grid Margin="0,0,0,0" RenderTransformOrigin="0.495,0.502" CornerRadius="10" Background="#FFD1DDF7" BorderThickness="10" BorderBrush="#FF454550">
-        <Button x:Name="btnHello" Content="Swipe" HorizontalAlignment="Right" Height="71" Margin="0,590,15,0" VerticalAlignment="Top" Width="244" Click="btnHello_Click" FontFamily="Segoe UI Black" FontSize="29" Foreground="#FF454550">
-            <Button.BorderBrush>
-                <SolidColorBrush Color="#CCCCCCCC" Opacity="0.10000000149011612"/>
-            </Button.BorderBrush>
-        </Button>
-        <Grid x:Name="grdCount" HorizontalAlignment="Right" Height="122" Margin="0,10,10,0" VerticalAlignment="Top" Width="380" Background="#FFFDFAFA" BorderBrush="#CCCCCCCC" BorderThickness="5" CornerRadius="40">
+        <Grid x:Name="grdCount" Margin="70,60,840,610" Background="#FFFDFAFA" BorderBrush="#CCCCCCCC" BorderThickness="5" CornerRadius="40">
             <TextBlock x:Name="txtCount" Margin="82,13,84,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Center" FontFamily="Segoe UI Black" FontSize="64" RenderTransformOrigin="-0.644,0.581" HorizontalAlignment="Center" Foreground="#FF454550"/>
         </Grid>
         <Grid Margin="0,0,0,0" VerticalAlignment="Bottom" BorderBrush="#FF464550" BorderThickness="0,5,0,0" Height="58">
@@ -37,11 +32,9 @@
             </StackPanel>
         </Grid>
         <ListView x:Name="lvPobList"
-                  HorizontalAlignment="Right"
-                  Height="420"
-                  Margin="0,150,10,0"
+                  Height="489"
+                  Margin="80,185,86,0"
                   VerticalAlignment="Top"
-                  Width="380"
                   Background="White"
                   BorderBrush="#CCCCCCCC"
                   BorderThickness="5"
