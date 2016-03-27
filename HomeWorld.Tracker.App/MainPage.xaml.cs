@@ -3,13 +3,17 @@ using HomeWorld.Tracker.App.Service;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using uPLibrary.Nfc;
 using uPLibrary.Hardware.Nfc;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Imaging;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -51,7 +55,7 @@ namespace HomeWorld.Tracker.App
             {
                 if (_nfcReader == null || _nfcReader != null && !_nfcReader.IsRunning)
                 {
-                    SetNfcStatus("Connecting to RFID Reader through UART Bridge ...");
+                    SetNfcStatus("Connecting Reader...");
 
                     if (_nfcReader != null)
                     {
@@ -115,13 +119,15 @@ namespace HomeWorld.Tracker.App
 
             //notify user UI
             await _dispatcher.RunAsync(
-                CoreDispatcherPriority.Normal, () =>
+                CoreDispatcherPriority.Normal, async () =>
                 {
                     var pobItem = new PobItem
                     {
                         Id = movementResponseDto.Id.ToString(),
-                        Name = $"{movementResponseDto.Name}"
+                        Name = $"{movementResponseDto.Name}",
+                        Image = await ToBitmapImage(movementResponseDto.Image)
                     };
+
                     if (movementResponseDto.Ingress)
                     {
                         PeopleOnBoard.Add(pobItem);
@@ -142,15 +148,33 @@ namespace HomeWorld.Tracker.App
                 });
         }
 
-        private void btnHello_Click(object sender, RoutedEventArgs e)
+        private async Task<BitmapImage> ToBitmapImage(byte[] bytes)
         {
-            _pobCount++;
-            txtCount.Text = _pobCount.ToString();
+            using (var stream = new InMemoryRandomAccessStream())
+            {
+                using (var writer = new DataWriter(stream.GetOutputStreamAt(0)))
+                {
+                    writer.WriteBytes(bytes);
+                    await writer.StoreAsync();
+                }
+                var image = new BitmapImage();
+                await image.SetSourceAsync(stream);
+
+                return image;
+            }
+
+            //var bmp = new WriteableBitmap(100, 100);
+            //using (var stream = bmp.PixelBuffer.AsStream())
+            //{
+            //    stream.Write(bytes, 0, bytes.Length);
+            //}
+
+            //return bmp;
         }
 
         void ItemListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var SelectedItem = (PobItem)lvPobList.SelectedItem;
+            var SelectedItem = (PobItem)LvPobList.SelectedItem;
 
         }
     }
