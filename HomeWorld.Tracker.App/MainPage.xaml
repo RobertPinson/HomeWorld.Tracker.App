@@ -32,8 +32,8 @@
             </StackPanel>
         </Grid>
         <ListView x:Name="LvPobList"
-                  Height="300"
-                  Margin="10,100,10,0"
+                  Height="310"
+                  Margin="5,95,5,0"
                   VerticalAlignment="Top"
                   Background="White"
                   BorderBrush="#CCCCCCCC"
@@ -42,15 +42,24 @@
           SelectionChanged="ItemListView_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Height="100" Margin="6">
+                    <Grid Height="90" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="200*"/>
                         </Grid.ColumnDefinitions>
-                        <Image Source="{Binding Image}" Margin="0,0,5,0"></Image>
+                        <Ellipse HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="80">
+                            <Ellipse.Fill>
+                                <ImageBrush Stretch="Uniform" ImageSource="{Binding Image}"/>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                        <!--<Image Source="{Binding Image}" Margin="0,0,5,0">
+                            <Image.Clip>
+                                <geom Center="50,50" RadiusX="50" RadiusY="50" />
+                            </Image.Clip>
+                        </Image>-->
                         <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="0,0,0,0">
-                            <TextBlock Text="{Binding Id}" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="NoWrap" Foreground="#FF454550" FontSize="24" Height="35" FontWeight="Normal"/>
-                            <TextBlock Text="{Binding Name}" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="NoWrap" Foreground="#FF454550" FontSize="29.333" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Id}" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="NoWrap" Foreground="#FF454550" FontSize="20" Height="35" FontWeight="Normal"/>
+                            <TextBlock Text="{Binding Name}" Style="{ThemeResource TitleTextBlockStyle}" TextWrapping="NoWrap" Foreground="#FF454550" FontSize="25" FontWeight="Bold"/>
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
