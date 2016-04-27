@@ -115,6 +115,11 @@ namespace HomeWorld.Tracker.App
             //Call service to get associated person details
             var movementResponseDto = await _personService.PostMovement(id);
 
+            if (movementResponseDto == null)
+            {
+                return;
+            }
+
             //TODO store locally
 
             //notify user UI

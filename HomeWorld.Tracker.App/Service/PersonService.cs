@@ -1,11 +1,13 @@
 using System;
 using System.Diagnostics;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using HomeWorld.Tracker.Dto;
 using Newtonsoft.Json;
+using HttpClient = Windows.Web.Http.HttpClient;
 
 namespace HomeWorld.Tracker.App.Service
 {
@@ -27,12 +29,20 @@ namespace HomeWorld.Tracker.App.Service
             try
             {
                 //Send the GET request
-                var movementDto = new MovementDto { Uid = cardId, DeviceId = deviceId };
+                var movementDto = new MovementDto {Uid = cardId, DeviceId = deviceId};
 
                 var postBody = JsonConvert.SerializeObject(movementDto);
 
-                var httpResponse = await httpClient.PostAsync(requestUri, new HttpStringContent(postBody, UnicodeEncoding.Utf8, "application/json"));
-                httpResponse.EnsureSuccessStatusCode();
+                var httpResponse =
+                    await
+                        httpClient.PostAsync(requestUri,
+                            new HttpStringContent(postBody, UnicodeEncoding.Utf8, "application/json"));
+
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+               
                 var httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
                 //guarded parse
@@ -49,6 +59,15 @@ namespace HomeWorld.Tracker.App.Service
             {
                 //todo log error
                 Debug.WriteLine(jex.Message);
+            }
+            catch (HttpRequestException httpex)
+            {
+                // Handle failure
+                Debug.WriteLine(httpex.Message);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
 
             return result;
