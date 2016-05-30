@@ -99,12 +99,17 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\SortedObservableCollection.cs" />
+    <Compile Include="DAL\IDataService.cs" />
+    <Compile Include="DAL\Model\Person.cs" />
+    <Compile Include="Domain\PersonManager.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\PobViewSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\MqttService.cs" />
     <Compile Include="Service\IPersonService.cs" />
     <Compile Include="Service\PersonService.cs" />
   </ItemGroup>
@@ -135,9 +140,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Domain\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\HomeWorld.Tracker.Dto\HomeWorld.Tracker.Dto.csproj">
       <Project>{e5e97494-e0bd-4b51-9263-181de9c020df}</Project>
@@ -150,6 +153,11 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="SQLite.UAP.2015, Version=3.10.2">
+      <Name>SQLite for Universal App Platform</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

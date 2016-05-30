@@ -68,10 +68,10 @@ namespace uPLibrary.Hardware.Nfc
 
         public static async Task<Pn532CommunicationHsu> CreateSerialPort(string deviceName)
         {
-            string deviceQuery = SerialDevice.GetDeviceSelector();
+             string deviceQuery = SerialDevice.GetDeviceSelector();
             var discovered = await DeviceInformation.FindAllAsync(deviceQuery);
-            //var readerInfo = discovered.FirstOrDefault(x => x.Name.IndexOf(deviceName, StringComparison.OrdinalIgnoreCase) > 0);
-            var readerInfo = discovered.FirstOrDefault();
+            var readerInfo = discovered.FirstOrDefault(x => x.Name.IndexOf(deviceName, StringComparison.OrdinalIgnoreCase) > 0);
+            //var readerInfo = discovered.FirstOrDefault();
 
             SerialDevice reader = null;
 

@@ -1,6 +1,7 @@
 ﻿using HomeWorld.Tracker.App.Model;
 using HomeWorld.Tracker.App.Service;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +14,13 @@ using uPLibrary.Hardware.Nfc;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media.Imaging;
+using HomeWorld.Tracker.App.Core;
+using HomeWorld.Tracker.App.DAL;
+using HomeWorld.Tracker.App.DAL.Model;
+using HomeWorld.Tracker.App.Domain;
+using HomeWorld.Tracker.Dto;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -27,6 +34,8 @@ namespace HomeWorld.Tracker.App
         private const string UartBridgeName = "USB to UART Bridge";
         private readonly IPersonService _personService;
         private INfcReader _nfcReader;
+        private PersonManager _personManager;
+        private MovementManager _movementManager;
 
         private int _pobCount;
         public ObservableCollection<PobItem> PeopleOnBoard { get; set; }
@@ -37,9 +46,16 @@ namespace HomeWorld.Tracker.App
         {
             InitializeComponent();
 
+            //TODO get config from 
+            _movementManager = new MovementManager(2, 4);
+
+            _personManager = new PersonManager();
+            _personManager.PeopleReceivedEventHandler += new EventHandler<List<Person>>(PeopleReceived);
             _pobCount = 0;
             txtCount.Text = _pobCount.ToString();
-            PeopleOnBoard = PobViewSource.GetPobList();
+
+            PeopleOnBoard = new SortedObservableCollection<PobItem>();
+           
             DataContext = this;
             _personService = new PersonService();
             _dispatcher = Window.Current.Dispatcher;
@@ -47,6 +63,36 @@ namespace HomeWorld.Tracker.App
             //start background task to connect to card Reader.
             var task = new Task(async () => await CreateNfcReader());
             task.Start();
+
+            //Mqtt Service Connect
+            MqttService.Connect();
+            MqttService.MessageReceived += new EventHandler<Movement>(MovementMessage);
+        }
+
+        private async void MovementMessage(object sender, Movement e)
+        {
+            //Get Person for local cache
+            var person = DataService.GetPersonByCardId(e.CardId);
+            if (person != null)
+            {
+                person.InLocation = e.InLocation;
+                DataService.AddUpdatePerson(person);
+
+                await UpdateUi(person);
+            }
+            else
+            {
+                //TODO get from server
+            }
+        }
+
+        private async void PeopleReceived(object sender, List<Person> e)
+        {
+            //People received from server and to local cache so need to update UI
+            foreach (var person in e)
+            {
+                await UpdateUi(person);
+            }
         }
 
         private async Task CreateNfcReader()
@@ -104,40 +150,85 @@ namespace HomeWorld.Tracker.App
             Debug.WriteLine("LOST " + BitConverter.ToString(e.Connection.ID));
 
             //perform actions on card removed from NFC field
-
         }
 
         private async void nfc_TagDetected(object sender, NfcTagEventArgs e)
         {
-            var id = BitConverter.ToString(e.Connection.ID);
-            Debug.WriteLine("DETECTED {0}", id);
+            var uId = BitConverter.ToString(e.Connection.ID);
+            Debug.WriteLine("DETECTED {0}", uId);
 
-            //Call service to get associated person details
-            var movementResponseDto = await _personService.PostMovement(id);
+            //1. Get Person
+            var person = DataService.GetPersonByCardId(uId);
 
-            if (movementResponseDto == null)
+            if (person == null)
             {
-                return;
+                //Call service to get associated person details
+                var movementResponseDto = await _personService.PostMovement(uId);
+
+                if (movementResponseDto == null)
+                {
+                    return;
+                }
+
+                person = new Person
+                {
+                    CardUid = movementResponseDto.CardUid,
+                    Id = movementResponseDto.Id,
+                    Name = movementResponseDto.Name,
+                    InLocation = movementResponseDto.Ingress,
+                    Image = movementResponseDto.Image
+                };
             }
 
-            //TODO store locally
+            //2. Update movements
+            var movement = new Movement
+            {
+                CardId = uId,
+                InLocation = !person.InLocation,
+                SwipeTime = DateTime.UtcNow.ToString("s")
+            };
+            DataService.AddMovement(movement);
 
+            //3. Update Person record
+            person.InLocation = !person.InLocation;
+            DataService.AddUpdatePerson(person);
+
+            //4. Update UI
+            await UpdateUi(person);
+        }
+
+        private async Task UpdateUi(Person person)
+        {
             //notify user UI
             await _dispatcher.RunAsync(
                 CoreDispatcherPriority.Normal, async () =>
                 {
                     var pobItem = new PobItem
                     {
-                        Id = movementResponseDto.Id.ToString(),
-                        Name = $"{movementResponseDto.Name}",
-                        Image = await ToBitmapImage(movementResponseDto.Image)
+                        Id = person.Id.ToString(),
+                        Name = person.Name,
+                        Image = await ToBitmapImage(person.Image)
                     };
 
-                    if (movementResponseDto.Ingress)
+                    if (person.InLocation)
                     {
-                        PeopleOnBoard.Add(pobItem);
-                        _pobCount++;
-                        txtCount.Text = _pobCount.ToString();
+                        //Add or update
+                        var item = PeopleOnBoard.FirstOrDefault(i => i.Id == pobItem.Id);
+
+                        if (item == null)
+                        {
+                            PeopleOnBoard.Add(pobItem);
+                            _pobCount++;
+                            txtCount.Text = _pobCount.ToString();
+                        }
+                        else
+                        {
+                            //item.Name = pobItem.Name;
+                            //item.Image = pobItem.Image;
+
+                            PeopleOnBoard.Remove(item);
+                            PeopleOnBoard.Add(pobItem);
+                        }
                     }
                     else
                     {
